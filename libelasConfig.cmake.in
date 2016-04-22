@@ -1,0 +1,12 @@
+# - Config file for the libelas package
+# It defines the following variables
+# libelas_INCLUDE_DIRS - include directories for the libelas libraries
+# libelas_LIBRARIES - directories containing libraries
+
+# Compute Paths
+get_filename_component(LIBELAS_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(libelas_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+set(libelas_LIBRARIES "@INSTALL_BIN_DIR@/liblibelas.so")
+message(STATUS "Found libelas")
+message(STATUS "   Includes: ${libelas_INCLUDE_DIRS}")
+message(STATUS "   Libraries: ${libelas_LIBRARIES}")

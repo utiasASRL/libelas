@@ -1,0 +1,11 @@
+<package>
+  <name>libelas</name>
+  <description>
+    Efficient Large-scale Stereo Matching
+  </description>
+  <version>1.0.0</version>
+  <maintainer email="p.berczi@robotics.utias.utoronto.ca">LPB</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
