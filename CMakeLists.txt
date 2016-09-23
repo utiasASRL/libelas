@@ -9,7 +9,7 @@ SET(CMAKE_CXX_FLAGS "-msse3")
 set(CATKIN_ENABLED "TRUE" CACHE BOOL "Catkin will export package information (for use with ROS)")
 if (CATKIN_ENABLED)
   find_package(catkin REQUIRED)
-  catkin_package()
+  catkin_package(LIBRARIES ${PROJECT_NAME})
 endif()
 
 ### TARGETS
