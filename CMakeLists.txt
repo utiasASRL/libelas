@@ -12,6 +12,8 @@ if (CATKIN_ENABLED)
   catkin_package()
 endif()
 
+include_directories(src)
+
 ### TARGETS
 add_library(${PROJECT_NAME}
   src/elas.cpp
@@ -93,6 +95,8 @@ message(STATUS "### ${INSTALL_INCLUDE_DIR}")
 message(STATUS "### ${INSTALL_BIN_DIR}")
 configure_file(${PROJECT_NAME}Config.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake" @ONLY)
+configure_file(${PROJECT_NAME}Config.cmake.in
+  "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${PROJECT_NAME}Config.cmake" @ONLY)
 
 # Install the <package>Config.cmake
 install(FILES
