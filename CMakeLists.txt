@@ -5,14 +5,14 @@ project (libelas)
 # use sse3 instruction set
 SET(CMAKE_CXX_FLAGS "-msse3")
 
+include_directories(include/libelas)
+
 ### CATKIN
 set(CATKIN_ENABLED "TRUE" CACHE BOOL "Catkin will export package information (for use with ROS)")
-if (CATKIN_ENABLED)
+if (${CATKIN_ENABLED})
   find_package(catkin REQUIRED)
-  catkin_package()
+  catkin_package(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
 endif()
-
-include_directories(src)
 
 ### TARGETS
 add_library(${PROJECT_NAME}
@@ -56,14 +56,8 @@ foreach(p INCLUDE BIN CMAKE CATKIN)
 endforeach()
 
 install(
-  FILES
-    src/elas.h
-    src/descriptor.h
-    src/filter.h
-    src/matrix.h
-    src/triangle.h
-    src/image.h
-    src/timer.h
+  DIRECTORY
+    include/libelas/
   DESTINATION ${INSTALL_INCLUDE_DIR}
 )
 
@@ -85,18 +79,15 @@ install(
 export(PACKAGE ${PROJECT_NAME})
 
 # Create variable for the local build tree
-get_property(CONF_INCLUDE_DIRS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-
+set(CONF_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Change the include location for the case of an install location
-set(CONF_INCLUDE_DIRS ${CONF_INCLUDE_DIRS} ${INSTALL_INCLUDE_DIR})
+set(CONF_INCLUDE_DIRS ${INSTALL_INCLUDE_DIR})
 
 # Create the <name>Config.cmake for the installation tree
 message(STATUS "### ${INSTALL_INCLUDE_DIR}")
 message(STATUS "### ${INSTALL_BIN_DIR}")
 configure_file(${PROJECT_NAME}Config.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake" @ONLY)
-configure_file(${PROJECT_NAME}Config.cmake.in
-  "${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${PROJECT_NAME}Config.cmake" @ONLY)
 
 # Install the <package>Config.cmake
 install(FILES
