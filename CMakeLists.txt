@@ -2,19 +2,25 @@
 cmake_minimum_required (VERSION 2.8)
 project (libelas)
 
-# use sse3 instruction set
+# build tool
+find_package(catkin_optional REQUIRED)
+co_build_type() # cache the build type
+
+### COMPILER SETUP
+
 SET(CMAKE_CXX_FLAGS "-msse3")
 
-include_directories(include/libelas)
+### ENABLE FIND_PACKAGE
 
-### CATKIN
-set(CATKIN_ENABLED "TRUE" CACHE BOOL "Catkin will export package information (for use with ROS)")
-if (${CATKIN_ENABLED})
-  find_package(catkin REQUIRED)
-  catkin_package(INCLUDE_DIRS include LIBRARIES ${PROJECT_NAME})
-endif()
+# export the package (for package config)
+co_export(
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  EXECUTABLES ${PROJECT_NAME}__demo)
 
 ### TARGETS
+
+include_directories(include/libelas)
 add_library(${PROJECT_NAME}
   src/elas.cpp
   src/descriptor.cpp
@@ -22,80 +28,10 @@ add_library(${PROJECT_NAME}
   src/matrix.cpp
   src/triangle.cpp
 )
-add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 
-add_executable(${PROJECT_NAME}__demo
-  src/main.cpp
-)
-target_link_libraries(${PROJECT_NAME}__demo
-  ${PROJECT_NAME}
-)
-add_dependencies(${PROJECT_NAME}__demo ${catkin_EXPORTED_TARGETS})
+add_executable(${PROJECT_NAME}__demo src/main.cpp)
+target_link_libraries(${PROJECT_NAME}__demo ${PROJECT_NAME})
 
-######################################################################################
 ### Set up install
-######################################################################################
 
-#setup installation locations
-set(INSTALL_INCLUDE_DIR include/${PROJECT_NAME} CACHE PATH "Installation directory for header files")
-set(INSTALL_BIN_DIR lib/${PROJECT_NAME} CACHE PATH "Installation directory for compiled binaries")
-set(INSTALL_CATKIN_DIR share/${PROJECT_NAME} CACHE PATH "Installation directory for catkin package.xml")
-if(WIN32 AND NOT CYGWIN)
-  set(DEF_INSTALL_CMAKE_DIR CMake)
-else()
-  set(DEF_INSTALL_CMAKE_DIR lib/cmake/${PROJECT_NAME})
-endif()
-set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
-
-# Make relative paths absolute (needed later on)
-foreach(p INCLUDE BIN CMAKE CATKIN)
-    set(var INSTALL_${p}_DIR)
-    if(NOT IS_ABSOLUTE "${${var}}")
-        set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
-    endif()
-endforeach()
-
-install(
-  DIRECTORY
-    include/libelas/
-  DESTINATION ${INSTALL_INCLUDE_DIR}
-)
-
-install(
-  TARGETS
-    ${PROJECT_NAME}
-    ${PROJECT_NAME}__demo
-  DESTINATION
-    ${INSTALL_BIN_DIR}
-)
-
-######################################################################################
-### Enable find_package()
-######################################################################################
-
-### Create the <package>Config.cmake and <package>ConfigVersion files
-
-# Export the package for use from the build-tree
-export(PACKAGE ${PROJECT_NAME})
-
-# Create variable for the local build tree
-set(CONF_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
-# Change the include location for the case of an install location
-set(CONF_INCLUDE_DIRS ${INSTALL_INCLUDE_DIR})
-
-# Create the <name>Config.cmake for the installation tree
-message(STATUS "### ${INSTALL_INCLUDE_DIR}")
-message(STATUS "### ${INSTALL_BIN_DIR}")
-configure_file(${PROJECT_NAME}Config.cmake.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake" @ONLY)
-
-# Install the <package>Config.cmake
-install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
-  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-
-add_custom_target(uninstall
-  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
-# Install Catkin package.xml
-install(FILES package.xml DESTINATION ${INSTALL_CATKIN_DIR})
+co_install()
